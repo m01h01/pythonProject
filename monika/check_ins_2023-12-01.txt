@@ -1,3 +1,4 @@
 : Mood ratings - {'Tuesday': 3, 'Wednesday': 5, 'Thursday': 5, 'Friday': 4, 'Saturday': 3, 'Sunday': 1}
 hg: Mood ratings - {}
 j: Mood ratings - {'Tuesday': 4, 'Wednesday': 4, 'Thursday': 4, 'Friday': 1, 'Saturday': 3, 'Sunday': 3}
+Monika: Mood ratings - {'Monday': 2, 'Tuesday': 3, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 5, 'Sunday': 5}

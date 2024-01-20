@@ -1,0 +1,2 @@
+dasdasd: Mood ratings - {'Monday': 2, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 3, 'Friday': 2, 'Saturday': 5, 'Sunday': 4}
+: Mood ratings - {'Monday': 2, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 3, 'Saturday': 2, 'Sunday': 2}

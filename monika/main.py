@@ -1,54 +1,78 @@
+from kivy.metrics import dp
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.scrollview import ScrollView
 from kivymd.app import MDApp
-from kivymd.uix.screen import Screen
-from kivymd.uix.button import MDRaisedButton
 from kivymd.uix.label import MDLabel
 from kivymd.uix.textfield import MDTextField
+from kivymd.uix.button import MDRaisedButton
 from kivymd.uix.dialog import MDDialog
 from kivy.uix.boxlayout import BoxLayout
 from datetime import datetime
+from kivy.core.window import Window
 
-class MentalApp(MDApp):
+class NameScreen(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
-    #main
-    def build(self):
-        self.layout = BoxLayout(orientation='vertical', spacing=10, padding=20)
+        name_container = BoxLayout(orientation='vertical', spacing=10, padding=10,size_hint_y=None)
 
         # Title
-        title_label = MDLabel(text="Weekly Wellness Check-in", font_style='H4')
-        self.layout.add_widget(title_label)
+        title_label = MDLabel(text="Weekly Wellness Check-in", font_style='H4', size_hint_y=None, height=dp(100))
+        name_container.add_widget(title_label)
 
-        # Name input in a container
-        name_container = BoxLayout(orientation='horizontal')
         name_label = MDLabel(text="Enter your name:")
         self.name_input = MDTextField(hint_text="Your Name")
         name_container.add_widget(name_label)
         name_container.add_widget(self.name_input)
 
-        self.layout.add_widget(name_container)
 
-        # Days of the week
-        self.day_inputs = {}
+        next_button = MDRaisedButton(text="Next", on_release=self.switch_to_checkin_screen)
 
-        days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        # Set the position of name_container to the center of the screen
+        name_container.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
 
-        # Create UI components for each day
-        for day in days:
-            label = MDLabel(text=day)
-            text_input = MDTextField(hint_text=f"How is your mood on {day}? (1 to 5)")
-            self.layout.add_widget(label)
-            self.layout.add_widget(text_input)
+        self.add_widget(name_container)
+        self.add_widget(next_button)
 
-            #save the number input from user to the array
-            self.day_inputs[day] = text_input
+    def switch_to_checkin_screen(self, instance):
+        # Switch to the CheckInScreen
+        self.manager.current = 'checkin'
 
-        # Create a button to trigger the check-in
-        check_in_button = MDRaisedButton(text="Check-in", on_release=self.show_summary)
-        self.layout.add_widget(check_in_button)
+class CheckInScreen(Screen):
+    def __init__(self, **kwargs):
+            super().__init__(**kwargs)
 
-        return self.layout
+            self.day_inputs = {}
+
+            days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+            # Create a BoxLayout for the content with orientation='vertical'
+            content_layout = BoxLayout(orientation='vertical', spacing=10, padding=10, size_hint_y=None)
+
+            # Set the height of the content_layout to match the height of the ScrollView
+            content_layout.bind(minimum_height=content_layout.setter('height'))
+
+            for day in days:
+                label = MDLabel(text=day, size_hint_y=None, height=30)
+                text_input = MDTextField(hint_text=f"How is your mood on {day}? (1 to 5)", size_hint_y=None, height=30)
+                content_layout.add_widget(label)
+                content_layout.add_widget(text_input)
+
+                self.day_inputs[day] = text_input
+
+            check_in_button = MDRaisedButton(text="Check-in", on_release=self.show_summary)
+            content_layout.add_widget(check_in_button)
+
+            # Create a ScrollView and add the content_layout to it
+            scroll_view = ScrollView(size_hint=(1, None), size=(Window.width, Window.height))
+            scroll_view.add_widget(content_layout)
+
+            self.add_widget(scroll_view)
+
 
     def show_summary(self, instance):
-        name = self.name_input.text
+        app = MDApp.get_running_app()
+        name = app.root.get_screen('name').name_input.text
 
         # Collect mood ratings for each day
         mood_ratings = {}
@@ -107,12 +131,8 @@ class MentalApp(MDApp):
         dialog = MDDialog(
             title="Check-in Summary",
             text=summary_text,
-            buttons=
-            [MDRaisedButton
-                (
-                    text="OK",
-                    on_release=self.dialog_dismiss,
-                ),
+            buttons=[
+                MDRaisedButton(text="OK", on_release=lambda *args: self.dialog_dismiss(dialog))
             ],
         )
 
@@ -120,6 +140,15 @@ class MentalApp(MDApp):
 
     def dialog_dismiss(self, dialog):
         dialog.dismiss()
+class MentalApp(MDApp):
+    def build(self):
+        sm = ScreenManager()
+        name_screen = NameScreen(name='name')
+        checkin_screen = CheckInScreen(name='checkin')
 
+        sm.add_widget(name_screen)
+        sm.add_widget(checkin_screen)
+
+        return sm
 if __name__ == "__main__":
     MentalApp().run()
